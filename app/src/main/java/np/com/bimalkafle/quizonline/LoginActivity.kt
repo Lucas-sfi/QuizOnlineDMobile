@@ -1,0 +1,64 @@
+// app/src/main/java/np/com/bimalkafle/quizonline/LoginActivity.kt
+package np.com.bimalkafle.quizonline
+
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import np.com.bimalkafle.quizonline.databinding.ActivityLoginBinding
+
+class LoginActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityLoginBinding
+    private lateinit var firebaseAuth: FirebaseAuth
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+
+        // Inicializa a instância do Firebase Auth
+        firebaseAuth = FirebaseAuth.getInstance()
+
+        // --- BÔNUS: VERIFICA SE O USUÁRIO JÁ ESTÁ LOGADO ---
+        // Se o usuário nunca fez logout, ele é levado direto para a tela principal
+        if (firebaseAuth.currentUser != null) {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish() // Impede que o usuário volte para a tela de login
+        }
+        // ---------------------------------------------------
+
+        setContentView(binding.root)
+
+        binding.loginButton.setOnClickListener {
+            val email = binding.emailEditText.text.toString()
+            val password = binding.passwordEditText.text.toString()
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // AQUI ESTÁ A MUDANÇA: Faz o login com o Firebase
+            firebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        // Login bem-sucedido, navega para a tela principal
+                        val intent = Intent(this, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                    } else {
+                        // Se o login falhar, exibe uma mensagem de erro
+                        // (Ex: usuário não encontrado, senha incorreta, etc.)
+                        Toast.makeText(this, "Falha no login: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+        }
+
+        binding.goToRegisterTextView.setOnClickListener {
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+            }
+        }
+}

@@ -1,4 +1,4 @@
-# Online Quiz App with Firebase2
+# Online Quiz App with Firebase
 
 #UI
 
