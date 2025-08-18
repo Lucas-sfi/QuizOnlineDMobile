@@ -20,8 +20,6 @@ class LoginActivity : AppCompatActivity() {
         // Inicializa a instância do Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance()
 
-        // O BLOCO DE CÓDIGO QUE FAZIA O LOGIN AUTOMÁTICO FOI REMOVIDO DAQUI
-
         binding.loginButton.setOnClickListener {
             val email = binding.emailEditText.text.toString()
             val password = binding.passwordEditText.text.toString()

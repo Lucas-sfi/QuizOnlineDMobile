@@ -9,6 +9,15 @@ import np.com.bimalkafle.quizonline.databinding.HistoryItemRecyclerRowBinding
 class HistoryAdapter(private val historyList: List<HistoryModel>) :
     RecyclerView.Adapter<HistoryAdapter.MyViewHolder>() {
 
+    /** Deepseek - inicio
+     *
+     * Prompt: Crie uma classe ViewHolder para um RecyclerView que exiba itens de histórico de quizzes.
+     * A classe deve:
+     * - Receber um binding do tipo HistoryItemRecyclerRowBinding
+     * - Ter um método bind() que popula as views com os dados de um HistoryModel
+     * - Exibir quizTitle, scoreText (com prefixo "Pontuação:") e percentage (com prefixo "Acertos:" e sufixo "%")
+     * - Incluir também a implementação do onCreateViewHolder com o inflate do binding
+     */
     class MyViewHolder(private val binding: HistoryItemRecyclerRowBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(model: HistoryModel) {
@@ -26,6 +35,7 @@ class HistoryAdapter(private val historyList: List<HistoryModel>) :
         )
         return MyViewHolder(binding)
     }
+    /** Deepseek - final */
 
     override fun getItemCount(): Int {
         return historyList.size

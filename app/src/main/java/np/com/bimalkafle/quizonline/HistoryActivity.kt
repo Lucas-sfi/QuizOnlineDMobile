@@ -34,7 +34,6 @@ class HistoryActivity : AppCompatActivity() {
     private fun fetchHistoryData() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId == null) {
-            // Idealmente, mostrar uma mensagem de erro
             return
         }
 

@@ -34,7 +34,7 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // AQUI ESTÁ A MUDANÇA: Cria o usuário no Firebase
+            // Cria o usuário no Firebase
             firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {

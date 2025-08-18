@@ -1,6 +1,16 @@
 // app/src/main/java/np/com/bimalkafle/quizonline/HistoryModel.kt
 package np.com.bimalkafle.quizonline
 
+/** Deepseek - inicio
+ *
+ * Prompt: Crie uma data class em Kotlin para representar um modelo de histórico de quizzes. A classe deve incluir os seguintes campos:
+ * quizTitle: String com valor padrão vazio
+ * scoreText: String com valor padrão vazio
+ * percentage: Inteiro com valor padrão 0
+ * timestamp: Timestamp do Firebase com valor padrão Timestamp.now()
+ * Inclua também um construtor vazio necessário para compatibilidade com o Firebase.
+ *
+ */
 import com.google.firebase.Timestamp
 
 data class HistoryModel(
@@ -12,3 +22,5 @@ data class HistoryModel(
     // Construtor vazio necessário para o Firebase
     constructor() : this("", "", 0, Timestamp.now())
 }
+
+/** Deepseek - final */
