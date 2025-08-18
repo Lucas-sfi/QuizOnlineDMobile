@@ -19,6 +19,7 @@ class QuizListAdapter(private val quizModelList : List<QuizModel>) :
                     val intent  = Intent(root.context,QuizActivity::class.java)
                     QuizActivity.questionModelList = model.questionList
                     QuizActivity.time = model.time
+                    intent.putExtra("QUIZ_TITLE", model.title) // ADICIONE ESTA LINHA
                     root.context.startActivity(intent)
                 }
             }

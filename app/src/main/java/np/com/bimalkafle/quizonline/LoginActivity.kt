@@ -1,4 +1,3 @@
-// app/src/main/java/np/com/bimalkafle/quizonline/LoginActivity.kt
 package np.com.bimalkafle.quizonline
 
 import android.content.Intent
@@ -16,20 +15,12 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root) // A interface agora é sempre exibida primeiro
 
         // Inicializa a instância do Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance()
 
-        // --- BÔNUS: VERIFICA SE O USUÁRIO JÁ ESTÁ LOGADO ---
-        // Se o usuário nunca fez logout, ele é levado direto para a tela principal
-        if (firebaseAuth.currentUser != null) {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish() // Impede que o usuário volte para a tela de login
-        }
-        // ---------------------------------------------------
-
-        setContentView(binding.root)
+        // O BLOCO DE CÓDIGO QUE FAZIA O LOGIN AUTOMÁTICO FOI REMOVIDO DAQUI
 
         binding.loginButton.setOnClickListener {
             val email = binding.emailEditText.text.toString()
@@ -40,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // AQUI ESTÁ A MUDANÇA: Faz o login com o Firebase
+            // Faz o login com o Firebase
             firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {

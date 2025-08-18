@@ -1,3 +1,4 @@
+// app/src/main/java/np/com/bimalkafle/quizonline/QuizActivity.kt
 package np.com.bimalkafle.quizonline
 
 import android.graphics.Color
@@ -9,9 +10,10 @@ import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import np.com.bimalkafle.quizonline.databinding.ActivityQuizBinding
 import np.com.bimalkafle.quizonline.databinding.ScoreDialogBinding
-import kotlin.math.min
 
 class QuizActivity : AppCompatActivity(),View.OnClickListener {
 
@@ -25,6 +27,7 @@ class QuizActivity : AppCompatActivity(),View.OnClickListener {
     var currentQuestionIndex = 0;
     var selectedAnswer = ""
     var score = 0;
+    lateinit var quizTitle: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +41,7 @@ class QuizActivity : AppCompatActivity(),View.OnClickListener {
             nextBtn.setOnClickListener(this@QuizActivity)
         }
 
+        quizTitle = intent.getStringExtra("QUIZ_TITLE") ?: "Quiz" // Recebe o título
         loadQuestions()
         startTimer()
     }
@@ -50,13 +54,11 @@ class QuizActivity : AppCompatActivity(),View.OnClickListener {
                 val minutes = seconds/60
                 val remainingSeconds = seconds % 60
                 binding.timerIndicatorTextview.text = String.format("%02d:%02d", minutes,remainingSeconds)
-
             }
 
             override fun onFinish() {
-                //Finish the quiz
+                finishQuiz()
             }
-
         }.start()
     }
 
@@ -80,7 +82,6 @@ class QuizActivity : AppCompatActivity(),View.OnClickListener {
     }
 
     override fun onClick(view: View?) {
-
         binding.apply {
             btn0.setBackgroundColor(getColor(R.color.gray))
             btn1.setBackgroundColor(getColor(R.color.gray))
@@ -90,19 +91,16 @@ class QuizActivity : AppCompatActivity(),View.OnClickListener {
 
         val clickedBtn = view as Button
         if(clickedBtn.id==R.id.next_btn){
-            //next button is clicked
             if(selectedAnswer.isEmpty()){
                 Toast.makeText(applicationContext,"Please select answer to continue",Toast.LENGTH_SHORT).show()
                 return;
             }
             if(selectedAnswer == questionModelList[currentQuestionIndex].correct){
                 score++
-                Log.i("Score of quiz",score.toString())
             }
             currentQuestionIndex++
             loadQuestions()
-        }else{
-            //options button is clicked
+        } else {
             selectedAnswer = clickedBtn.text.toString()
             clickedBtn.setBackgroundColor(getColor(R.color.orange))
         }
@@ -111,19 +109,22 @@ class QuizActivity : AppCompatActivity(),View.OnClickListener {
     private fun finishQuiz(){
         val totalQuestions = questionModelList.size
         val percentage = ((score.toFloat() / totalQuestions.toFloat() ) *100 ).toInt()
+        val scoreText = "$score de $totalQuestions"
+
+        saveResultToFirebase(scoreText, percentage)
 
         val dialogBinding  = ScoreDialogBinding.inflate(layoutInflater)
         dialogBinding.apply {
             scoreProgressIndicator.progress = percentage
             scoreProgressText.text = "$percentage %"
             if(percentage>60){
-                scoreTitle.text = "Congrats! You have passed"
+                scoreTitle.text = "Parabéns! Você passou"
                 scoreTitle.setTextColor(Color.BLUE)
-            }else{
-                scoreTitle.text = "Oops! You have failed"
+            } else {
+                scoreTitle.text = "Oops! Tente novamente"
                 scoreTitle.setTextColor(Color.RED)
             }
-            scoreSubtitle.text = "$score out of $totalQuestions are correct"
+            scoreSubtitle.text = "$scoreText corretas"
             finishBtn.setOnClickListener {
                 finish()
             }
@@ -133,24 +134,27 @@ class QuizActivity : AppCompatActivity(),View.OnClickListener {
             .setView(dialogBinding.root)
             .setCancelable(false)
             .show()
-
     }
+
+    private fun saveResultToFirebase(scoreText: String, percentage: Int) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId == null) {
+            Toast.makeText(this, "Você precisa estar logado para salvar o histórico.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val historyEntry = HistoryModel(quizTitle, scoreText, percentage)
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .collection("history")
+            .add(historyEntry)
+            .addOnSuccessListener {
+                Log.d("HISTORY_SAVE", "Histórico salvo com sucesso!")
+            }
+            .addOnFailureListener { e ->
+                Log.e("HISTORY_SAVE", "Erro ao salvar histórico", e)
+                }
+        }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
